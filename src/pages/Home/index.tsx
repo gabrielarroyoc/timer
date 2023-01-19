@@ -1,8 +1,8 @@
-import { Play } from "phosphor-react";
+import { HandPalm, Play } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
-import { differenceInSeconds  } from 'date-fns';
+import { differenceInSeconds } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CountdownContainer,
@@ -11,6 +11,7 @@ import {
   MinutesAmountInput,
   Separator,
   StartCountdownButton,
+  StopCountdownButton,
   TaskInput,
 } from "./styles";
 
@@ -28,7 +29,7 @@ interface Cycle {
   id: string;
   task: string;
   minutesAmount: number;
-  startDate: new Date();
+  startDate: Date;
 }
 
 export function Home() {
@@ -47,13 +48,19 @@ export function Home() {
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
 
   useEffect(() => {
-    if(activeCycle) {
-      setInterval(() => {
+    let interval: number;
+
+    if (activeCycle) {
+      interval = setInterval(() => {
         setAmountSecondsPassed(
-        differenceInSeconds( new Date(), activeCycle.startDate),)
-      }, 1000)
+          differenceInSeconds(new Date(), activeCycle.startDate)
+        );
+      }, 1000);
     }
-  }, [activeCycle])
+    return () => {
+      clearInterval(interval);
+    };
+  }, [activeCycle]);
 
   function handleCreateNewCycle(data: NewCycleFormData) {
     const id = String(new Date().getTime());
@@ -61,14 +68,14 @@ export function Home() {
       id: id,
       task: data.task,
       minutesAmount: data.minutesAmount,
+      startDate: new Date(),
     };
 
     setCycles((state) => [...state, newCycle]);
     setActiveCycleId(id);
+    setAmountSecondsPassed(0);
     reset();
   }
-
-
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
@@ -79,13 +86,19 @@ export function Home() {
   const minutes = String(minutesAmount).padStart(2, "0");
   const seconds = String(secondsAmount).padStart(2, "0");
 
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds}`;
+    }
+  }, [minutes, seconds, activeCycle]);
+
   const task = watch("task");
 
   const isSubmitDisabled = !task;
 
   return (
     <HomeContainer>
-      <form onSubmit={handleSubmit(handleCreateNewCycle)}>
+      <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
         <FormContainer>
           <label htmlFor="task">Vou trabalhar em</label>
           <TaskInput
@@ -95,12 +108,10 @@ export function Home() {
             {...register("task")}
           />
           <datalist id="task-suggestions">
-            <option value="Projeto 1"></option>
-            <option value="Projeto 2"></option>
-            <option value="Projeto 3"></option>
-            <option value="Projeto 4"></option>
-            <option value="Projeto 5"></option>
-            <option value="Projeto 6"></option>
+            <option value="Projeto 1" />
+            <option value="Projeto 2" />
+            <option value="Projeto 3" />
+            <option value="Banana" />
           </datalist>
           <label htmlFor="minutesAmount">durante</label>
           <MinutesAmountInput
@@ -110,6 +121,7 @@ export function Home() {
             step={5}
             min={5}
             max={60}
+            {...register("minutesAmount", { valueAsNumber: true })}
           />
 
           <span>minutos.</span>
@@ -123,10 +135,17 @@ export function Home() {
           <span>{seconds[1]}</span>
         </CountdownContainer>
 
-        <StartCountdownButton disabled={isSubmitDisabled} type="submit">
-          <Play size={24} />
-          Começar
-        </StartCountdownButton>
+        {activeCycle ? (
+          <StopCountdownButton type="button">
+            <HandPalm size={24} />
+            Começar
+          </StopCountdownButton>
+        ) : (
+          <StartCountdownButton disabled={isSubmitDisabled} type="submit">
+            <Play size={24} />
+            Começar
+          </StartCountdownButton>
+        )}
       </form>
     </HomeContainer>
   );
