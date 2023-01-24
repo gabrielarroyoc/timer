@@ -1,13 +1,10 @@
 import { FormContainer, MinutesAmountInput, TaskInput } from "./styles";
-import * as zod from "zod";
-import { useForm, useFormContext } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext } from "react";
+import { useFormContext } from "react-hook-form";
 import { CyclesContext } from "../../../../contexts/CyclesContext";
 
 export function NewCycleForm() {
   const { activeCycle } = useContext(CyclesContext);
-
   const { register } = useFormContext();
 
   return (
@@ -20,12 +17,14 @@ export function NewCycleForm() {
         disabled={!!activeCycle}
         {...register("task")}
       />
+
       <datalist id="task-suggestions">
         <option value="Projeto 1" />
         <option value="Projeto 2" />
         <option value="Projeto 3" />
         <option value="Banana" />
       </datalist>
+
       <label htmlFor="minutesAmount">durante</label>
       <MinutesAmountInput
         type="number"
