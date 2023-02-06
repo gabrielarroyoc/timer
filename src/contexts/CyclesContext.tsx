@@ -7,10 +7,11 @@ import {
   useState,
 } from "react";
 import {
+  ActionTypes,
   addNewCycleAction,
   interruptCurrentCycleAction,
   markCurrentCycleAsFinishedAction,
-} from "../reducers/cycles/action";
+} from "../reducers/cycles/actions";
 import { Cycle, cyclesReducer } from "../reducers/cycles/reducer";
 
 interface CreateCycleData {
@@ -52,10 +53,14 @@ export function CyclesContextProvider({
       if (storedStateAsJSON) {
         return JSON.parse(storedStateAsJSON);
       }
+      return {
+        cycles: [],
+        activeCycleId: null,
+      };
     }
   );
 
-  const { activeCycleId, cycles } = cyclesState;
+  const { cycles, activeCycleId } = cyclesState;
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
 
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(() => {
