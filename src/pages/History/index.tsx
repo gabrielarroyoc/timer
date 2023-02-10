@@ -1,11 +1,19 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import { CyclesContext } from "../../contexts/CyclesContext";
 import { HistoryContainer, HistoryList, Status } from "./styles";
+import { Trash } from "phosphor-react";
 
 export function History() {
+  const [tasks, setTasks] = useState(false);
+
   const { cycles } = useContext(CyclesContext);
+
+  function handleDelete(id: string) {
+    const filteredHistory: any = cycles.filter((cycles) => cycles.id !== id);
+    setTasks(filteredHistory);
+  }
 
   return (
     <HistoryContainer>
@@ -17,7 +25,7 @@ export function History() {
             <tr>
               <th>Tarefa</th>
               <th>Duração</th>
-              <th>Duração</th>
+              <th>Início</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -40,6 +48,12 @@ export function History() {
 
                     {cycle.interruptedDate && (
                       <Status statusColor="red">Interrompido</Status>
+                    )}
+
+                    {cycle.interruptedDate && (
+                      <button onClick={() => handleDelete(cycle.id)}>
+                        <Trash />
+                      </button>
                     )}
 
                     {!cycle.finishedDate && !cycle.interruptedDate && (
