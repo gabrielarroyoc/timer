@@ -2,7 +2,7 @@ import styled from "styled-components";
 export const HistoryContainer = styled.main`
   flex: 1;
   padding: 3.5rem;
-  
+
   overflow-y: hidden;
 
   display: flex;
@@ -11,6 +11,24 @@ export const HistoryContainer = styled.main`
   h1 {
     font-size: 1.5rem;
     color: ${(props) => props.theme["gray-100"]};
+  }
+`;
+
+export const DeleteButton = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+
+  border-radius: 6px;
+  cursor: pointer;
+  height: 40px;
+  width: 40px;
+  background-color: ${(props) => props.theme["gray-400"]};
+
+  &:hover {
+    background-color: ${(props) => props.theme["red-400"]};
+    transition: all ease-in-out 0.2s;
   }
 `;
 

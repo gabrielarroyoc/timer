@@ -23,6 +23,15 @@ export function cyclesReducer(state: CyclesState, action: any) {
         draft.cycles.push(action.payload.newCycle);
         draft.activeCycleId = action.payload.newCycle.id;
       });
+    case ActionTypes.REMOVE_CYCLE: {
+      const { id } = action.payload;
+      const filteredCycles = state.cycles.filter((cycle) => cycle.id !== id);
+
+      return {
+        ...state,
+        cycles: filteredCycles,
+      };
+    }
     case ActionTypes.INTERRUPT_CURRENT_CYCLE: {
       const currentCycleIndex = state.cycles.findIndex((cycle) => {
         return cycle.id === state.activeCycleId;

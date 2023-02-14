@@ -2,18 +2,13 @@ import { useContext, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import { CyclesContext } from "../../contexts/CyclesContext";
-import { HistoryContainer, HistoryList, Status } from "./styles";
+import { DeleteButton, HistoryContainer, HistoryList, Status } from "./styles";
 import { Trash } from "phosphor-react";
 
 export function History() {
-  const [tasks, setTasks] = useState(false);
+  const { cycles, handleDelete } = useContext(CyclesContext);
 
-  const { cycles } = useContext(CyclesContext);
-
-  function handleDelete(id: string) {
-    const filteredHistory: any = cycles.filter((cycles) => cycles.id !== id);
-    setTasks(filteredHistory);
-  }
+  const handleDeleteClick = (id: string) => () => handleDelete(id);
 
   return (
     <HistoryContainer>
@@ -27,6 +22,7 @@ export function History() {
               <th>Duração</th>
               <th>Início</th>
               <th>Status</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -41,6 +37,7 @@ export function History() {
                       locale: ptBR,
                     })}
                   </td>
+
                   <td>
                     {cycle.finishedDate && (
                       <Status statusColor="green">Concluído</Status>
@@ -50,14 +47,18 @@ export function History() {
                       <Status statusColor="red">Interrompido</Status>
                     )}
 
-                    {cycle.interruptedDate && (
-                      <button onClick={() => handleDelete(cycle.id)}>
-                        <Trash />
-                      </button>
-                    )}
-
                     {!cycle.finishedDate && !cycle.interruptedDate && (
                       <Status statusColor="yellow">Em andamento</Status>
+                    )}
+                  </td>
+                  <td>
+                    {cycle.interruptedDate && (
+                      <DeleteButton
+                        title="Excluir"
+                        onClick={handleDeleteClick(cycle.id)}
+                      >
+                        <Trash size={22} />
+                      </DeleteButton>
                     )}
                   </td>
                 </tr>
